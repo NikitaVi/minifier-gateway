@@ -13,11 +13,11 @@ const (
 	prod = "prod"
 )
 
-func Init() {
+func Init() error {
 	cfg := os.Getenv("ENV")
 
 	if cfg == "" {
-		panic("env variable ENV is not set")
+		return fmt.Errorf("ENV variable not set")
 	}
 
 	switch cfg {
@@ -30,6 +30,8 @@ func Init() {
 			slog.NewJSONHandler(os.Stdout, &slog.HandlerOptions{Level: slog.LevelWarn}),
 		)
 	}
+
+	return nil
 }
 
 func Debug(msg string, args ...any) {
@@ -66,4 +68,8 @@ func Fatal(msg string, args ...any) {
 	}
 	globalLogger.Error(msg)
 	os.Exit(1)
+}
+
+func Logger() *slog.Logger {
+	return globalLogger
 }
