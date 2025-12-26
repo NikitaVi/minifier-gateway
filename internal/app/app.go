@@ -2,6 +2,7 @@ package app
 
 import (
 	"context"
+	"fmt"
 	"github.com/NikitaVi/minifier-gateway/internal/config"
 	"github.com/NikitaVi/minifier-gateway/internal/logger"
 	"github.com/gin-gonic/gin"
@@ -43,6 +44,8 @@ func (a *App) initApp(ctx context.Context) error {
 
 func (a *App) initConfig(ctx context.Context) error {
 	err := config.Load(".env")
+	fmt.Println("HERE")
+
 	if err != nil {
 		return err
 	}
@@ -58,8 +61,14 @@ func (a *App) initServiceProvider(ctx context.Context) error {
 func (a *App) initHTTP(ctx context.Context) error {
 	if a.httpServer == nil {
 		a.httpServer = gin.New()
+
+		apiGroup := a.httpServer.Group("/api")
+
+		for _, controller := range a.serviceProvide.AllControllers(ctx) {
+			controller.RegisterRoutes(apiGroup)
+		}
 	}
-	//TODO: finish when controller would be ready
+
 	return nil
 }
 
